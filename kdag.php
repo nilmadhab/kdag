@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Web scrapping 101</title>
-    <!-- Latest compiled and minified CSS -->
-    <link href=
-    "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
-    rel="stylesheet">
+
     <?php
         require_once('simple_html_dom.php');
         function db_connect(){
@@ -22,11 +15,7 @@
 $conn = db_connect();
 
     ?>
-</head>
 
-<body>
-   
-    <div class="container">
     <?php 
         function single_page($url){
            $conn = db_connect();
@@ -72,7 +61,7 @@ $conn = db_connect();
         }
 
        // single_page("http://www.northeasttoday.in/louis-berger-papers-missing-assam-cm-orders-cid-probe/");
-        $url = "http://www.northeasttoday.in/category/arunachal-pradesh/";
+       /* $url = "http://www.northeasttoday.in/category/arunachal-pradesh/";
         $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
              curl_setopt($ch ,CURLOPT_PROXY, '10.3.100.207');
@@ -91,12 +80,58 @@ $conn = db_connect();
                 echo $count." : ".$url->plaintext."-->".$url->getAttribute("href")."<br />";
 
                 single_page($url->getAttribute("href"));
+            }*/
+
+
+
+            $url = "http://www.northeasttoday.in/louis-berger-papers-missing-assam-cm-orders-cid-probe/";
+              $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+             curl_setopt($ch ,CURLOPT_PROXY, '10.3.100.207');
+            curl_setopt($ch, CURLOPT_PROXYPORT,'8080');
+            $page = curl_exec($ch);
+            $page = str_get_html($page);
+            //echo $page;
+            curl_close($ch);
+            $count =0;
+            $content = $page->find(".main-menu",0);
+             $links = $content->find("a");
+            foreach ($links as $url) {
+               // $url = $url1->find("a",0);
+                $count +=1;
+               // if(!preg_match("/northeasttoday.in/", subject))
+               
+                if(!preg_match("/category/", $url->getAttribute("href"))){
+                    continue;
+                }
+                 echo $count." : ".$url->plaintext."-->".$url->getAttribute("href")."<br />\n";
+                 $url = $url->getAttribute("href");
+                 $ch = curl_init($url);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                     curl_setopt($ch ,CURLOPT_PROXY, '10.3.100.207');
+                    curl_setopt($ch, CURLOPT_PROXYPORT,'8080');
+                    $page = curl_exec($ch);
+                    $page = str_get_html($page);
+                    //echo $page;
+                    curl_close($ch);
+                    $count =0;
+                    $content = $page->find(".main-content-left",0);
+                     $links = $content->find("h2");
+                    foreach ($links as $url1) {
+                        $url = $url1->find("a",0);
+                        $count +=1;
+                       // if(!preg_match("/northeasttoday.in/", subject))
+                        echo $count." : ".$url->plaintext."-->".$url->getAttribute("href")."\n";
+
+                        single_page($url->getAttribute("href"));
+                        //break;
+                    }
+
+
+
+               // single_page($url->getAttribute("href"));
             }
 
 
     ?>
 
-    </div>
-  
-</body>
-</html>
